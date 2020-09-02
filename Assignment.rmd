@@ -1,0 +1,23 @@
+rawdata = read.csv('pml-training.csv',na.strings=c('','NA'))
+data = rawdata[,!apply(rawdata,2,function(x) any(is.na(x)) )]
+trainingdata = trainingdata[,-c(1:7)]
+
+rawtestdata = read.csv('pml-testing.csv',na.strings=c('','NA'))
+testdata = rawtestdata[,!apply(rawtestdata,2,function(x) any(is.na(x)) )]
+testdata = testdata[,-c(1:7)]
+
+install.packages('randomForest')
+library('randomForest')
+install.packages('caret')
+library('caret')
+
+subGrps = createDataPartition(y=data$classe, p=0.6, list=FALSE)
+subTraining = c[subGrps,]
+subTesting = c[-subGrps, ]
+dim(subTraining)
+dim(subTesting)
+
+rf = randomForest(classe~., data=(subTraining), method='class')
+rfpred = predict(rf,subTesting, type='class')
+rfcfmatrix = confusionMatrix(pred,subTesting$classe)
+rfcfmatrix$table
